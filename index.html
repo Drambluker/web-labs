@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/ajax.js"></script>
+    <script src="js/init.js" defer></script>
+    <script src="js/todo.js" defer></script>
+</head>
+
+<body>
+    <div class="header">
+        <img src="img/Bathrobe_Zapp.png" />
+        <h2>Erotic Typicode TODO</h2>
+        <input type="text" id="todoInput" placeholder="Title...">
+        <span onclick="addNewElementFromInput()" class="addBtn">Add</span>
+        <select>
+            <option value="all">All</option>
+            <option value="incompleted">Incompleted</option>
+            <option value="completed">Completed</option>
+        </select>
+    </div>
+
+    <ul id="todoList"></ul>
+</body>
+
+</html>
