@@ -1,4 +1,4 @@
-var Controller = function (View, Model) {
+const Controller = function (View, Model) {
   this.tankView = View;
   this.tankModel = Model;
 };
@@ -18,5 +18,5 @@ Controller.prototype.needRendering = function () {
   this.tankView.render(tankModel.objs);
 };
 
-var tankController = new Controller(tankView, tankModel);
+const tankController = new Controller(tankView, tankModel);
 tankController.init();

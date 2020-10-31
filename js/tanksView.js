@@ -1,12 +1,7 @@
-const TANK_SIZE = 40;
-const BULLET_SIZE = 10;
-const BULLET_OFFSET = 15;
-
-var View = function () {
-  this.tank = document.querySelector(".tank");
-  this.enemy = document.querySelector(".enemy");
+const View = function () {
   this.score = document.querySelector(".score");
-  this.bullet = document.querySelector(".bullet");
+  this.canvas = document.querySelector(".canvas");
+  this.ctx = this.canvas.getContext("2d");
   this.onKeyDownEvent = null;
 };
 
@@ -15,55 +10,55 @@ View.prototype.init = function () {
 };
 
 View.prototype.render = function (objs) {
-  let deg;
+  this.canvas.width = objs.canvas.width;
+  this.canvas.height = objs.canvas.height;
+  this.ctx.fillStyle = "white";
+  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  this.ctx.strokeStyle = "black";
+  this.ctx.lineWidth = objs.canvas.border;
+  this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
 
-  this.tank.style.left = "calc(50% + " + objs.tank.x + "px)";
-  this.tank.style.top = "calc(50% + " + objs.tank.y + "px)";
-
+  let degrees;
   switch (objs.tank.direction) {
     case DIRECTION_LEFT:
-      deg = 180;
+      degrees = 180;
       break;
     case DIRECTION_UP:
-      deg = 270;
+      degrees = 270;
       break;
     case DIRECTION_RIGHT:
-      deg = 0;
+      degrees = 0;
       break;
     case DIRECTION_DOWN:
-      deg = 90;
+      degrees = 90;
       break;
   }
 
-  this.tank.style.webkitTransform = "rotate(" + deg + "deg)";
-  this.tank.style.mozTransform = "rotate(" + deg + "deg)";
-  this.tank.style.msTransform = "rotate(" + deg + "deg)";
-  this.tank.style.oTransform = "rotate(" + deg + "deg)";
-  this.tank.style.transform = "rotate(" + deg + "deg)";
+  this.renderSprite(objs.tank.sprite, objs.tank.x, objs.tank.y, degrees, objs.tank.xScale, objs.tank.yScale);
 
-  if (objs.enemy.hidden) {
-    this.enemy.style.width = "0px";
-    this.enemy.style.height = "0px";
-  } else {
-    this.enemy.style.width = TANK_SIZE + "px";
-    this.enemy.style.height = TANK_SIZE + "px";
-    this.enemy.style.left = "calc(50% + " + objs.enemy.x + "px)";
-    this.enemy.style.top = "calc(50% + " + objs.enemy.y + "px)";
+  if (!objs.enemy.hidden) {
+    this.renderSprite(objs.enemy.sprite, objs.enemy.x, objs.enemy.y, 0, objs.enemy.xScale, objs.enemy.yScale);
   }
 
   this.score.textContent = objs.score;
 
-  if (objs.bullet.hidden) {
-    this.bullet.style.width = "0px";
-    this.bullet.style.height = "0px";
-  } else {
-    this.bullet.style.width = BULLET_SIZE + "px";
-    this.bullet.style.height = BULLET_SIZE + "px";
-    this.bullet.style.left =
-      "calc(50% + " + (objs.bullet.x + BULLET_OFFSET) + "px)";
-    this.bullet.style.top =
-      "calc(50% + " + (objs.bullet.y + BULLET_OFFSET) + "px)";
+  if (!objs.bullet.hidden) {
+    this.ctx.fillStyle = "black";
+    this.ctx.save();
+    this.ctx.translate(this.canvas.width / 2 + objs.bullet.x, this.canvas.height / 2 + objs.bullet.y)
+    this.ctx.fillRect(-objs.bullet.size / 2, -objs.bullet.size / 2, objs.bullet.size, objs.bullet.size);
+    this.ctx.restore();
   }
 };
 
-var tankView = new View();
+View.prototype.renderSprite = function (sprite, x, y, angle, xScale, yScale) {
+  this.ctx.save();
+  this.ctx.translate(this.canvas.width / 2 + x, this.canvas.height / 2 + y);
+  this.ctx.rotate(Math.PI * angle / 180);
+  this.ctx.drawImage(sprite,
+      -xScale * sprite.naturalWidth / 2, -yScale * sprite.naturalHeight / 2,
+      sprite.naturalWidth * xScale, sprite.naturalHeight * yScale);
+  this.ctx.restore();
+}
+
+const tankView = new View();
