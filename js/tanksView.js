@@ -36,9 +36,11 @@ View.prototype.render = function (objs) {
 
   this.renderSprite(objs.tank.sprite, objs.tank.x, objs.tank.y, degrees, objs.tank.xScale, objs.tank.yScale);
 
-  if (!objs.enemy.hidden) {
-    this.renderSprite(objs.enemy.sprite, objs.enemy.x, objs.enemy.y, 0, objs.enemy.xScale, objs.enemy.yScale);
-  }
+  objs.enemies.forEach(enemy => {
+    if (!enemy.hidden) {
+      this.renderSprite(enemy.sprite, enemy.x, enemy.y, 0, enemy.xScale, enemy.yScale);
+    }
+  })
 
   this.score.textContent = objs.score;
 

@@ -1,8 +1,10 @@
 const Model = function () {
     const tankSprite = new Image();
     tankSprite.src = "assets/img/tank.png"
-    const enemySprite = new Image();
-    enemySprite.src = "assets/img/tank.png";
+    const enemySprite1 = new Image();
+    enemySprite1.src = "assets/img/tank.png";
+    const enemySprite2 = new Image();
+    enemySprite2.src = "assets/img/tank.png";
 
     this.objs = {
         canvas: {
@@ -20,16 +22,28 @@ const Model = function () {
             hidden: false,
             sprite: tankSprite
         },
-        enemy: {
-            type: "tank",
-            x: Math.floor(Math.random() * 400 - 200),
-            y: INITIAL_ENEMY_Y,
-            xScale: 0.1,
-            yScale: 0.1,
-            direction: INITIAL_ENEMY_DIRECTION,
-            hidden: false,
-            sprite: enemySprite
-        },
+        enemies: [
+            {
+                type: "tank",
+                x: Math.floor(Math.random() * 400 - 200),
+                y: INITIAL_ENEMY_Y,
+                xScale: 0.1,
+                yScale: 0.1,
+                direction: INITIAL_ENEMY_DIRECTION,
+                hidden: false,
+                sprite: enemySprite1
+            },
+            {
+                type: "tank",
+                x: Math.floor(Math.random() * 400 - 200),
+                y: INITIAL_ENEMY_Y + 100,
+                xScale: 0.1,
+                yScale: 0.1,
+                direction: INITIAL_ENEMY_DIRECTION,
+                hidden: false,
+                sprite: enemySprite2
+            }
+        ],
         bullet: {
             type: "bullet",
             x: INITIAL_BULLET_X,
@@ -149,7 +163,7 @@ Model.prototype.checkCollisions = function (obj, x, y) {
         y - delta <= UP_BORDER ||
         y + delta >= DOWN_BORDER;
 
-    const enemyCollision = this.isEnemyCollision(x, y);
+    const enemyCollision = this.isEnemyCollisions(x, y);
 
     if (!borderCollision && !enemyCollision) {
         obj.x = x;
@@ -159,19 +173,33 @@ Model.prototype.checkCollisions = function (obj, x, y) {
 
         if (enemyCollision) {
             this.objs.score++;
-            this.hide(this.objs.enemy, true);
+            this.objs.enemies.forEach(enemy => {
+                if (this.isEnemyCollision(enemy, x, y)) {
+                    this.hide(enemy, true);
+                }
+            })
         }
     }
 }
 
-Model.prototype.isEnemyCollision = function (x, y) {
-    if (!this.isHidden(this.objs.enemy)) {
-        const width = this.objs.enemy.xScale * this.objs.enemy.sprite.naturalWidth;
-        const height = this.objs.enemy.yScale * this.objs.enemy.sprite.naturalHeight;
-        const xCollision = ((x >= this.objs.enemy.x && x <= this.objs.enemy.x + width) ||
-            (x + width >= this.objs.enemy.x && x + width <= this.objs.enemy.x + width));
-        const yCollision = ((y >= this.objs.enemy.y && y <= this.objs.enemy.y + height) ||
-            (y + height >= this.objs.enemy.y && y + height <= this.objs.enemy.y + height));
+Model.prototype.isEnemyCollisions = function (x, y) {
+    let result = false;
+    this.objs.enemies.forEach(enemy => {
+        if (!this.isHidden(enemy)) {
+            result |= this.isEnemyCollision(enemy, x, y);
+        }
+    });
+    return result;
+}
+
+Model.prototype.isEnemyCollision = function (enemy, x, y) {
+    if (!this.isHidden(enemy)) {
+        const width = enemy.xScale * enemy.sprite.naturalWidth;
+        const height = enemy.yScale * enemy.sprite.naturalHeight;
+        const xCollision = ((x >= enemy.x && x <= enemy.x + width) ||
+            (x + width >= enemy.x && x + width <= enemy.x + width));
+        const yCollision = ((y >= enemy.y && y <= enemy.y + height) ||
+            (y + height >= enemy.y && y + height <= enemy.y + height));
         return xCollision && yCollision;
     } else {
         return false;
