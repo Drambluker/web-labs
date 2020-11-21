@@ -1,7 +1,9 @@
 const View = function () {
   this.score = document.querySelector(".score");
-  this.canvas = document.querySelector(".canvas");
-  this.ctx = this.canvas.getContext("2d");
+  this.scene = document.querySelector(".scene");
+  this.tank = document.querySelector(".tank");
+  this.enemies = document.querySelectorAll(".enemy");
+  this.bullet = document.querySelector(".bullet");
   this.onKeyDownEvent = null;
 };
 
@@ -10,57 +12,58 @@ View.prototype.init = function () {
 };
 
 View.prototype.render = function (objs) {
-  this.canvas.width = objs.canvas.width;
-  this.canvas.height = objs.canvas.height;
-  this.ctx.fillStyle = "white";
-  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-  this.ctx.strokeStyle = "black";
-  this.ctx.lineWidth = objs.canvas.border;
-  this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
+  this.scene.setAttribute("width", objs.scene.width.toString());
+  this.scene.setAttribute("height", objs.scene.height.toString());
+  this.scene.style.border = objs.scene.borderWidth + "px solid " + objs.scene.borderColor;
+  this.renderImgEntity(this.tank, objs.tank, objs.scene);
+
+  for (let i = 0; i < this.enemies.length && i < objs.enemies.length; i++) {
+    this.renderImgEntity(this.enemies[i], objs.enemies[i], objs.scene);
+  }
+
+  this.basicRenderEntity(this.bullet, objs.bullet, objs.scene);
+  this.score.textContent = objs.score;
+};
+
+View.prototype.renderImgEntity = function (entity, model, scene) {
+  this.basicRenderEntity(entity, model, scene);
+  entity.setAttribute("href", model.sprite);
+}
+
+View.prototype.basicRenderEntity = function (entity, model, scene) {
+  if (model.hidden) {
+    entity.setAttribute("width", 0);
+    entity.setAttribute("height", 0);
+    return;
+  }
+
+  entity.setAttribute("width", model.width);
+  entity.setAttribute("height", model.height);
 
   let degrees;
-  switch (objs.tank.direction) {
+  switch (model.direction) {
     case DIRECTION_LEFT:
       degrees = 180;
+      entity.setAttribute("x", (-0.5 * (scene.width) - model.x - 0.5 * model.width).toString());
+      entity.setAttribute("y", (-0.5 * (scene.height) + model.y - 0.5 * model.height).toString());
       break;
     case DIRECTION_UP:
       degrees = 270;
+      entity.setAttribute("x", (-0.5 * (scene.height) + model.y - 0.5 * model.height).toString());
+      entity.setAttribute("y", (0.5 * (scene.width) + model.x - 0.5 * model.width).toString());
       break;
     case DIRECTION_RIGHT:
       degrees = 0;
+      entity.setAttribute("x", (0.5 * (scene.width) + model.x - 0.5 * model.width).toString());
+      entity.setAttribute("y", (0.5 * (scene.height) - model.y - 0.5 * model.height).toString());
       break;
     case DIRECTION_DOWN:
       degrees = 90;
+      entity.setAttribute("x", (0.5 * (scene.height) - model.y - 0.5 * model.height).toString());
+      entity.setAttribute("y", (-0.5 * (scene.width) - model.x - 0.5 * model.width).toString());
       break;
   }
-
-  this.renderSprite(objs.tank.sprite, objs.tank.x, objs.tank.y, degrees, objs.tank.xScale, objs.tank.yScale);
-
-  objs.enemies.forEach(enemy => {
-    if (!enemy.hidden) {
-      this.renderSprite(enemy.sprite, enemy.x, enemy.y, 0, enemy.xScale, enemy.yScale);
-    }
-  })
-
-  this.score.textContent = objs.score;
-
-  if (!objs.bullet.hidden) {
-    this.ctx.fillStyle = "black";
-    this.ctx.save();
-    this.ctx.translate(this.canvas.width / 2 + objs.bullet.x, this.canvas.height / 2 + objs.bullet.y)
-    this.ctx.fillRect(-objs.bullet.size / 2, -objs.bullet.size / 2, objs.bullet.size, objs.bullet.size);
-    this.ctx.restore();
-  }
-};
-
-View.prototype.renderSprite = function (sprite, x, y, angle, xScale, yScale) {
-  this.ctx.save();
-  this.ctx.translate(this.canvas.width / 2 + x, this.canvas.height / 2 + y);
-  this.ctx.rotate(Math.PI * angle / 180);
-  this.ctx.drawImage(sprite,
-      -xScale * sprite.naturalWidth / 2, -yScale * sprite.naturalHeight / 2,
-      sprite.naturalWidth * xScale, sprite.naturalHeight * yScale);
-  this.ctx.restore();
+  entity.setAttribute("transform", "rotate(" + degrees + ")");
 }
 
 const tankView = new View();

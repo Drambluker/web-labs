@@ -1,54 +1,49 @@
 const Model = function () {
-    const tankSprite = new Image();
-    tankSprite.src = "assets/img/tank.png"
-    const enemySprite1 = new Image();
-    enemySprite1.src = "assets/img/tank.png";
-    const enemySprite2 = new Image();
-    enemySprite2.src = "assets/img/tank.png";
-
     this.objs = {
-        canvas: {
-            width: CANVAS_WIDTH,
-            height: CANVAS_HEIGHT,
-            border: CANVAS_BORDER,
+        scene: {
+            width: SCENE_WIDTH,
+            height: SCENE_HEIGHT,
+            borderColor: "green",
+            borderWidth: SCENE_BORDER,
         },
         tank: {
             type: "tank",
             x: INITIAL_TANK_X,
             y: INITIAL_TANK_Y,
-            xScale: 0.1,
-            yScale: 0.1,
+            width: INITIAL_TANKS_WIDTH,
+            height: INITIAL_TANKS_HEIGHT,
             direction: INITIAL_TANK_DIRECTION,
             hidden: false,
-            sprite: tankSprite
+            sprite: "assets/img/tank.png"
         },
         enemies: [
             {
                 type: "tank",
-                x: Math.floor(Math.random() * 400 - 200),
-                y: INITIAL_ENEMY_Y,
-                xScale: 0.1,
-                yScale: 0.1,
-                direction: INITIAL_ENEMY_DIRECTION,
+                x: 200,
+                y: 200,
+                width: INITIAL_TANKS_WIDTH,
+                height: INITIAL_TANKS_HEIGHT,
+                direction: DIRECTION_LEFT,
                 hidden: false,
-                sprite: enemySprite1
+                sprite: "assets/img/tank.png"
             },
             {
                 type: "tank",
-                x: Math.floor(Math.random() * 400 - 200),
-                y: INITIAL_ENEMY_Y + 100,
-                xScale: 0.1,
-                yScale: 0.1,
-                direction: INITIAL_ENEMY_DIRECTION,
+                x: -200,
+                y: -200,
+                width: INITIAL_TANKS_WIDTH,
+                height: INITIAL_TANKS_HEIGHT,
+                direction: DIRECTION_RIGHT,
                 hidden: false,
-                sprite: enemySprite2
+                sprite: "assets/img/tank.png"
             }
         ],
         bullet: {
             type: "bullet",
             x: INITIAL_BULLET_X,
             y: INITIAL_BULLET_Y,
-            size: 10,
+            width: INITIAL_BULLET_SIZE,
+            height: INITIAL_BULLET_SIZE,
             direction: INITIAL_BULLET_DIRECTION,
             hidden: true,
         },
@@ -106,7 +101,7 @@ Model.prototype.tankMove = function (e) {
         }
         case KEY_CODE_UP: {
             tankModel.setDirection(tankModel.objs.tank, DIRECTION_UP);
-            tankModel.setCoords(tankModel.objs.tank, null, y - TANK_STEP);
+            tankModel.setCoords(tankModel.objs.tank, null, y + TANK_STEP);
             break;
         }
         case KEY_CODE_RIGHT: {
@@ -116,7 +111,7 @@ Model.prototype.tankMove = function (e) {
         }
         case KEY_CODE_DOWN: {
             tankModel.setDirection(tankModel.objs.tank, DIRECTION_DOWN);
-            tankModel.setCoords(tankModel.objs.tank, null, y + TANK_STEP);
+            tankModel.setCoords(tankModel.objs.tank, null, y - TANK_STEP);
             break;
         }
         case KEY_CODE_SPACE: {
@@ -140,13 +135,13 @@ Model.prototype.tankBang = function () {
             tankModel.setCoords(bullet, x - BULLET_STEP, y);
             break;
         case DIRECTION_UP:
-            tankModel.setCoords(bullet, null, y - BULLET_STEP);
+            tankModel.setCoords(bullet, null, y + BULLET_STEP);
             break;
         case DIRECTION_RIGHT:
             tankModel.setCoords(bullet, x + BULLET_STEP, y);
             break;
         case DIRECTION_DOWN:
-            tankModel.setCoords(bullet, null, y + BULLET_STEP);
+            tankModel.setCoords(bullet, null, y - BULLET_STEP);
             break;
     }
 
@@ -156,12 +151,12 @@ Model.prototype.tankBang = function () {
 };
 
 Model.prototype.checkCollisions = function (obj, x, y) {
-    const delta = obj.type !== "bullet" ? obj.xScale * obj.sprite.naturalWidth / 2 : obj.size / 2;
+    const delta = 0.5 * obj.width;
     const borderCollision =
         x - delta <= LEFT_BORDER ||
         x + delta >= RIGHT_BORDER ||
-        y - delta <= UP_BORDER ||
-        y + delta >= DOWN_BORDER;
+        y + delta >= UP_BORDER ||
+        y - delta <= DOWN_BORDER;
 
     const enemyCollision = this.isEnemyCollisions(x, y);
 
@@ -194,12 +189,10 @@ Model.prototype.isEnemyCollisions = function (x, y) {
 
 Model.prototype.isEnemyCollision = function (enemy, x, y) {
     if (!this.isHidden(enemy)) {
-        const width = enemy.xScale * enemy.sprite.naturalWidth;
-        const height = enemy.yScale * enemy.sprite.naturalHeight;
-        const xCollision = ((x >= enemy.x && x <= enemy.x + width) ||
-            (x + width >= enemy.x && x + width <= enemy.x + width));
-        const yCollision = ((y >= enemy.y && y <= enemy.y + height) ||
-            (y + height >= enemy.y && y + height <= enemy.y + height));
+        const xCollision = ((x >= enemy.x && x <= enemy.x + enemy.width) ||
+            (x + enemy.width >= enemy.x && x + enemy.width <= enemy.x + enemy.width));
+        const yCollision = ((y >= enemy.y && y <= enemy.y + enemy.height) ||
+            (y + enemy.height >= enemy.y && y + enemy.height <= enemy.y + enemy.height));
         return xCollision && yCollision;
     } else {
         return false;

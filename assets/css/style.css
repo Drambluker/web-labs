@@ -1,11 +1,11 @@
-.canvas {
-    display: block;
-    position: relative;;
-    margin: 0 auto;
-}
-
 .interface {
     position: relative;
     font-size: 50px;
     z-index: 100;
+}
+
+.scene {
+    display: block;
+    position: relative;;
+    margin: 0 auto;
 }
