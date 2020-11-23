@@ -36,6 +36,16 @@ const Model = function () {
                 direction: DIRECTION_RIGHT,
                 hidden: false,
                 sprite: "assets/img/tank.png"
+            },
+            {
+                type: "tank",
+                x: -200,
+                y: 200,
+                width: INITIAL_TANKS_WIDTH,
+                height: INITIAL_TANKS_HEIGHT,
+                direction: DIRECTION_RIGHT,
+                hidden: false,
+                sprite: "assets/img/tank.png"
             }
         ],
         bullet: {

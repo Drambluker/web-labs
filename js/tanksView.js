@@ -17,7 +17,16 @@ View.prototype.render = function (objs) {
   this.scene.style.border = objs.scene.borderWidth + "px solid " + objs.scene.borderColor;
   this.renderImgEntity(this.tank, objs.tank, objs.scene);
 
-  for (let i = 0; i < this.enemies.length && i < objs.enemies.length; i++) {
+  this.enemies.forEach(enemy => {
+    this.scene.removeChild(enemy);
+  });
+
+  objs.enemies.forEach(() => {
+    this.scene.innerHTML += "<image class='enemy'/>";
+  });
+  this.enemies = document.querySelectorAll(".enemy");
+
+  for (let i = 0; i < objs.enemies.length; i++) {
     this.renderImgEntity(this.enemies[i], objs.enemies[i], objs.scene);
   }
 
